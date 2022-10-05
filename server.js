@@ -32,12 +32,11 @@ inquirer.prompt([
         type: 'list',
         name: 'choices',
         message: "What would you like to do",
-        choices: ["View all departments?", "View all roles?", "View all employees","Quit"]
-    }
+        choices: ["View all departments?", "View all roles?", "---add new role?","View all employees","---add new employee?","Quit"]
+    },
 ])
 .then((answers) => {
     const { choices } = answers;
-
 
 if (choices === "View all departments?"){
 showdDepartment();
@@ -46,17 +45,22 @@ showdDepartment();
 if (choices === "View all roles?"){
     showRoles();
 }
+if(choices === "---add new role?"){
+   return addNewRole();
+}
 if (choices === "View all employees"){
     showEmployees();
+}
+if (choices === "---add new employee"){
+    return addNewEmployee()
 }
 if (choices === "Quit"){
  db.end()
 }
+ 
 
 })
 }
-
-
 
 showdDepartment =()=>{
 const sql = `SELECT department.id AS id, department.name AS department FROM department`;
@@ -77,7 +81,7 @@ showRoles = () =>{
 };
 
 showEmployees = () =>{
-    const sql = `SELECT employee.id as id, department.name as department, employee.first_name as name, role.title, role_id as role, last_name, manager_id as manager from employee inner join role on employee.id = role.id inner join department on department.id = role.department_id`;
+    const sql = `SELECT employee.id as id, department.name as department, employee.first_name as name,last_name, role.title, role_id as role, manager_id as manager from employee inner join role on employee.id = role.id inner join department on department.id = role.department_id`;
     db.query(sql, (err,rows)=>{
         if (err) throw err;
         console.table(rows)
@@ -87,48 +91,52 @@ showEmployees = () =>{
 
 
 function addNewRole(){
-    const sql = `select * from department` 
+    const sql = `select name, id from department` 
     db.query(sql, (err,rows) =>{
         if (err) throw err;
         inquirer.prompt([
             {
                 type: 'input',
                 name: 'addTitle',
-                message: 'do you want add new role'
-            },{
+                message: 'what is your new role/job title? '
+            },
+            {
+            type:'input',
+            name: 'salary',
+            message:"what is the salary range?"
+            },
+
+            {
                 type:'list',
                 name:'departmentid',
                 message:'what department is this role a part of? ',
                 choices: rows.map(department=>department.name)
 
             }
+            
         ]).then(res =>{
             const chosenDepartment = rows.find(department=>department.name === res.departmentid)
-            db.query("insert into role set ?", { title: res.addTitle, department_id: chosenDepartment.id})
-
+            db.query("insert into role set ?", { title: res.addTitle, salary: res.salary, department_id: chosenDepartment.id})
+            showRoles();
         })
     })
 }
-//addNewRole();
 
-
-
-
+//salary: res.salary, 
 
 function addNewEmployee(){
-    const promptUser = ()=> {
+    const sql = `select name, id from department` 
+    db.query(sql, (err,rows) =>{
+        if (err) throw err;
         inquirer.prompt([
-            {
+        {
                 type: 'input',
-                name: 'choices',
-                message: "Name of new Employee",
+                name: 'employeeName',
+                message: "Input Name of new Employee",
                 
             }
         ])
         .then((answers) => {
             const { choices } = answers;
         
-})}
-addNewEmployee();
-showEmployees();
-};
+})})};
