@@ -105,7 +105,6 @@ function addNewRole(){
             name: 'salary',
             message:"what is the salary range?"
             },
-
             {
                 type:'list',
                 name:'departmentid',
@@ -131,10 +130,27 @@ function addNewEmployee(){
         inquirer.prompt([
         {
                 type: 'input',
-                name: 'employeeName',
-                message: "Input Name of new Employee",
+                name: 'firstName',
+                message: "Input First Name of new Employee",
                 
-            }
+            },
+            {
+                type: 'input',
+                name: 'lastName',
+                message: "Input last Name of new Employee",
+                
+            },
+            {
+                type: 'input',
+                name: 'role',
+                message: "Input employee role",
+                
+            },
+            {
+                type: "input",
+                name:"manager",
+                choices: rows.map(department=>department.name)
+             }
         ])
         .then((answers) => {
             const { choices } = answers;
