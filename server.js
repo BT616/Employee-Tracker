@@ -17,9 +17,8 @@ db.connect(err =>{
     if(err) throw err;
     afterConnect()
 });
-//3
 afterConnect =()=>{
- promptUser();
+ //promptUser();
 }
 
 
@@ -52,7 +51,7 @@ if (choices === "View all employees"){
     showEmployees();
 }
 if (choices === "---add new employee"){
-    return addNewEmployee()
+    addNewEmployee();
 }
 if (choices === "Quit"){
  db.end()
@@ -111,8 +110,7 @@ function addNewRole(){
                 message:'what department is this role a part of? ',
                 choices: rows.map(department=>department.name)
 
-            }
-            
+            } 
         ]).then(res =>{
             const chosenDepartment = rows.find(department=>department.name === res.departmentid)
             db.query("insert into role set ?", { title: res.addTitle, salary: res.salary, department_id: chosenDepartment.id})
@@ -124,7 +122,7 @@ function addNewRole(){
 //salary: res.salary, 
 
 function addNewEmployee(){
-    const sql = `select name, id from department` 
+    const sql = `select role.id, role.title from role` 
     db.query(sql, (err,rows) =>{
         if (err) throw err;
         inquirer.prompt([
@@ -137,22 +135,30 @@ function addNewEmployee(){
             {
                 type: 'input',
                 name: 'lastName',
-                message: "Input last Name of new Employee",
-                
-            },
-            {
-                type: 'input',
-                name: 'role',
-                message: "Input employee role",
-                
-            },
-            {
-                type: "input",
-                name:"manager",
-                choices: rows.map(department=>department.name)
-             }
+                message: "Input Last Name of new Employee",
+                },
+                {
+                    type: 'input',
+                    name: 'rollie',
+                    message: "Whats their role?",
+                                           
+                },
+                {
+                    type: 'input',
+                    name: 'managerID',
+                    message: "whats their manager id",
+                    },
+            
         ])
-        .then((answers) => {
-            const { choices } = answers;
-        
+        .then(res =>{
+            
+            db.query("insert into employee set ?", { first_name: res.firstName,last_name: res.lastName, role_id ,manager_id })
+           
+
+            
+            
+
+            
+        showEmployees();
 })})};
+addNewEmployee()
